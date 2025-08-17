@@ -27,3 +27,6 @@ coverage/
 .vscode/
 .idea/
 Thumbs.db
+
+#db
+database.sqlite
