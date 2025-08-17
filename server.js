@@ -29,6 +29,10 @@ import  User from './model/user.js'
   }
 })();
 
+//imported_routes
+import apiDocsRouter from './route/api-docs.js';
+app.use(apiDocsRouter);
+
 //middleware
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
