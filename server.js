@@ -15,6 +15,15 @@ const port = process.env.PORT || 3333;
 import sequelize from './config/database.js';
 import  User from './model/user.js'
 
+//middleware
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+app.use(cookieParser());
+
+
 //db_sync
 (async () => {
   try {
@@ -35,15 +44,6 @@ app.use(apiDocsRouter);
 
 import userRoutes from './route/user.js'
 app.use(userRoutes)
-
-//middleware
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-app.use(express.static(path.join(__dirname, 'public')));
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
-
 
 //test_route
 app.get('/', (req, res, next) => {
