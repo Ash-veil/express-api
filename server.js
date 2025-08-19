@@ -33,6 +33,9 @@ import  User from './model/user.js'
 import apiDocsRouter from './route/api-docs.js';
 app.use(apiDocsRouter);
 
+import userRoutes from './route/user.js'
+app.use(userRoutes)
+
 //middleware
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
