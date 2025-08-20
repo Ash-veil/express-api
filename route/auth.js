@@ -2,6 +2,7 @@ import express from 'express';
 import User from '../model/user.js';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import { userSchema } from '../middleware/validation.js';
 
 const router = express.Router();
 const JWT_SECRET = process.env.JWT_SECRET ;
@@ -27,6 +28,10 @@ router.post('/auth/login', async (req, res) => {
 });
 
 router.post('/auth/register', async (req, res) => {
+    const { error } = userSchema.validate(req.body);
+    if (error) {
+        return res.status(400).json({ error: error.details[0].message });
+    }
     try {
         const { username, email, password } = req.body;
         const existingUser = await User.findOne({ where: { email } });

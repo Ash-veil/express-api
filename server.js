@@ -22,6 +22,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+import { authenticateJWT } from './middleware/auth.js';
 
 
 //db_sync
@@ -38,13 +39,14 @@ app.use(cookieParser());
   }
 })();
 
+
 //imported_routes
 import apiDocsRouter from './route/api-docs.js';
 app.use(apiDocsRouter);
-import userRoutes from './route/user.js'
-app.use(userRoutes)
 import authRoutes from './route/auth.js';
 app.use(authRoutes);
+import userRoutes from './route/user.js'
+app.use(userRoutes)
 
 //test_route
 app.get('/', (req, res, next) => {

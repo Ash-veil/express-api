@@ -2,6 +2,7 @@ import express from "express"
 import User from '../model/user.js'
 import bcrypt from 'bcryptjs'
 
+import { userSchema } from "../middleware/validation.js";
 import { authenticateJWT } from '../middleware/auth.js';
 import { requireRole } from '../middleware/role.js';
 
@@ -9,6 +10,10 @@ const router = express.Router()
 router.use(authenticateJWT);
 
 router.post('/user',requireRole('admin'), async (req, res) =>{
+    const { error } = userSchema.validate(req.body);
+    if (error) {
+        return res.status(400).json({ error: error.details[0].message });
+    }
     try {
         if (req.body.password) {
             req.body.password = await bcrypt.hash(req.body.password, 10);
@@ -57,6 +62,10 @@ router.get('/user/:id', requireRole('admin'), async(req, res) =>{
 })
 
 router.patch('/user/:id', requireRole('admin'), async(req, res) =>{
+    const { error } = userSchema.validate(req.body);
+    if (error) {
+        return res.status(400).json({ error: error.details[0].message });
+    }
     try {
         const userId = req.params.id;
         if (req.body.password) {
