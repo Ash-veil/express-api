@@ -20,6 +20,11 @@ const User =  sequelize.define('user', {
         allowNull: false,
         unique: true
     },
+    role: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        defaultValue: 'user'
+    },
     createdAt: {
         type: DataTypes.DATE,
         defaultValue: DataTypes.NOW
@@ -27,8 +32,15 @@ const User =  sequelize.define('user', {
     updatedAt: {
         type: DataTypes.DATE,
         defaultValue: DataTypes.NOW
-    }
+    },
+  
+
 }, {
+    scopes: {
+        withoutPassword: {
+            attributes: { exclude: ['password'] }
+        }
+    },
     timestamps: true,
     tableName: 'users',
     underscored: true,

@@ -30,7 +30,7 @@ app.use(cookieParser());
     await sequelize.authenticate();
     console.log("✅ Database connected.");
 
-    await sequelize.sync({ alter: true , force: false, logging: true }); 
+    await sequelize.sync({ alter: true , force: false}); 
     console.log("✅ Models synced.");
 
   } catch (err) {
