@@ -1,10 +1,15 @@
 import express from "express"
 import User from '../model/user.js'
+import bcrypt from 'bcryptjs'
+
 
 const router = express.Router()
 
 router.post('/user', async (req, res) =>{
     try {
+        if (req.body.password) {
+            req.body.password = await bcrypt.hash(req.body.password, 10);
+        }
         const user = await User.create(req.body);
         res.status(201).json(user);
     } catch (error) {
@@ -51,6 +56,9 @@ router.get('/user/:id', async(req, res) =>{
 router.patch('/user/:id', async(req, res) =>{
     try {
         const userId = req.params.id;
+        if (req.body.password) {
+            req.body.password = await bcrypt.hash(req.body.password, 10);
+        }
         const [updated] = await User.update(req.body, { where: { id: userId } });
         if (updated) {
             const updatedUser = await User.findByPk(userId);

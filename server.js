@@ -30,7 +30,7 @@ app.use(cookieParser());
     await sequelize.authenticate();
     console.log("✅ Database connected.");
 
-    await sequelize.sync({ alter: true }); 
+    await sequelize.sync({ alter: true , force: false, logging: true }); 
     console.log("✅ Models synced.");
 
   } catch (err) {
@@ -41,9 +41,10 @@ app.use(cookieParser());
 //imported_routes
 import apiDocsRouter from './route/api-docs.js';
 app.use(apiDocsRouter);
-
 import userRoutes from './route/user.js'
 app.use(userRoutes)
+import authRoutes from './route/auth.js';
+app.use(authRoutes);
 
 //test_route
 app.get('/', (req, res, next) => {
