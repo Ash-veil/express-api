@@ -54,20 +54,22 @@ router.use(authenticateJWT);
  *                   example: 42
  *                 username:
  *                   type: string
- *                   example: johndoe
+ *                   example: john doe
  *                 email:
  *                   type: string
  *                   example: johndoe@example.com
  *                 createdAt:
  *                   type: string 
- *                   example: 2023-08-31T12:00:00.000Z 
+ *                   example: 2023-08-31T12:00:00.000Z
  *                 updatedAt:
  *                   type: string
  *                   example: 2023-08-31T12:00:00.000Z
- *       400:
- *         description: Invalid input (missing or malformed fields)
- *       401:
- *         description: Unauthorized (missing or invalid JWT token)
+ *       400: 
+ *         description: Invalid input 
+ *       403:
+ *         description: Forbidden insufficient permission
+ *       500:
+ *         description: Failed to create user
  */
 
 router.post('/user',requireRole('admin'), async (req, res) =>{
@@ -114,8 +116,10 @@ router.post('/user',requireRole('admin'), async (req, res) =>{
  *                   email:
  *                     type: string
  *                     example: johndoe@example.com
- *       401:
- *         description: Unauthorized (missing or invalid JWT token)
+ *       403:
+ *         description: Forbidden insufficient permission
+ *       500:
+ *         description: Failed to fetch users
  */
 
 router.get('/user/all', requireRole('admin'), async (req, res) =>{
@@ -126,6 +130,43 @@ router.get('/user/all', requireRole('admin'), async (req, res) =>{
         res.status(500).json({ error: "Failed to fetch users: " + error.message });
     }
 })
+
+/**
+ * @openapi
+ * /users/{id}:
+ *   delete:
+ *     summary: Delete a user
+ *     description: Deletes a user by ID. Requires a valid JWT token.
+ *     tags:
+ *       - Users
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: The ID of the user to delete
+ *         example: 42
+ *     responses:
+ *       200:
+ *         description: User deleted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: User deleted successfully
+ *       403:
+ *         description: Forbidden insufficient permission
+ *       404:
+ *         description: User not found
+ *       500:
+ *         description: Failed to delete user
+ */
 
 router.delete('/user/:id', requireRole('admin'), async (req, res) =>{
    try {
@@ -141,6 +182,56 @@ router.delete('/user/:id', requireRole('admin'), async (req, res) =>{
    }
 })
 
+/**
+ * @openapi
+ * /user/{id}:
+ *   get:
+ *     summary: Get a single user
+ *     description: Returns details of a specific user by ID. Requires a valid JWT token.
+ *     tags:
+ *       - Users
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: The ID of the user
+ *         example: 42
+ *     responses:
+ *       200:
+ *         description: "User details retrieved successfully"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: integer
+ *                   example: 42
+ *                 username:
+ *                   type: string
+ *                   example: johndoe
+ *                 email:
+ *                   type: string
+ *                   example: johndoe@example.com
+ *                 createdAt:
+ *                   type: string
+ *                   format: date-time
+ *                   example: 2023-08-31T12:00:00.000Z
+ *                 updatedAt:
+ *                   type: string
+ *                   format: date-time
+ *                   example: 2023-08-31T12:00:00.000Z
+ *       403:
+ *         description: Forbidden insufficient permission
+ *       404:
+ *         description: User not found
+ *       500:
+ *         description: Failed to fetch user
+ */
 router.get('/user/:id', requireRole('admin'), async(req, res) =>{
     try {
         const user = await User.scope('withoutPassword').findByPk(req.params.id);
@@ -154,6 +245,76 @@ router.get('/user/:id', requireRole('admin'), async(req, res) =>{
     }
 })
 
+/**
+ * @openapi
+ * /user/{id}:
+ *   patch:
+ *     summary: Update a user
+ *     description: Update user details by ID. Requires a valid JWT token.
+ *     tags:
+ *       - Users
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: The ID of the user
+ *         example: 42
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               username:
+ *                 type: string
+ *                 example: newusername
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 example: newemail@example.com
+ *               password:
+ *                 type: string
+ *                 format: password
+ *                 example: NewStrongPassword123
+ *     responses:
+ *       200:
+ *         description: "User updated successfully"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: integer
+ *                   example: 42
+ *                 username:
+ *                   type: string
+ *                   example: newusername
+ *                 email:
+ *                   type: string
+ *                   example: newemail@example.com
+ *                 createdAt:
+ *                   type: string
+ *                   format: date-time
+ *                   example: 2023-08-31T12:00:00.000Z
+ *                 updatedAt:
+ *                   type: string
+ *                   format: date-time
+ *                   example: 2023-08-31T13:00:00.000Z
+ *       400: 
+ *         description: Invalid input 
+ *       403:
+ *         description: Forbidden insufficient permission
+ *       404:
+ *         description: User not found
+ *       500:
+ *         description: Failed to fetch user
+ */
 router.patch('/user/:id', requireRole('admin'), async(req, res) =>{
     const { error } = userSchema.validate(req.body);
     if (error) {
