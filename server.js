@@ -39,6 +39,11 @@ import { authenticateJWT } from './middleware/auth.js';
   }
 })();
 
+//test_route
+app.get('/', (req, res, next) => {
+  res.send("Welcome to the server!");
+});
+
 
 //imported_routes
 import apiDocsRouter from './route/api-docs.js';
@@ -48,10 +53,7 @@ app.use(authRoutes);
 import userRoutes from './route/user.js'
 app.use(userRoutes)
 
-//test_route
-app.get('/', (req, res, next) => {
-  res.send("Welcome to the server!");
-});
+
 
 //server_start
 app.listen(port, () => {

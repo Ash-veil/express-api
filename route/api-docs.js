@@ -1,14 +1,36 @@
 import express from 'express';
 import swaggerUi from 'swagger-ui-express';
-import swaggerDocument from '../swagger.json' with { type: 'json' };
+import swaggerJsdoc from 'swagger-jsdoc';
 
 const router = express.Router();
 
-router.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+const options = {
+  definition: {
+    openapi: "3.0.0",
+    info: {
+      title: "My API",
+      version: "1.0.0",
+    },
+    components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: "http",
+          scheme: "bearer",
+          bearerFormat: "JWT",
+        },
+      },
+    },
+    security: [
+      {
+        bearerAuth: [], 
+      },
+    ],
+  },
+  apis: ["./route/*.js"], 
+};
 
-router.get('/api-docs/swagger.json', (req, res) => {
-  res.setHeader('Content-Type', 'application/json');
-  res.send(swaggerDocument);
-});
+const swaggerSpec = swaggerJsdoc(options);
+
+router.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 export default router;
